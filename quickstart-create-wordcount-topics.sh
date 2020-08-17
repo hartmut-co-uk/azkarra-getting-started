@@ -16,7 +16,10 @@
 set -e
 
 create_topic() {
-    docker exec -it $1 /usr/bin/kafka-topics --create --topic $2 --partitions $3 --replication-factor $4 --zookeeper zookeeper:2181
+    #docker exec -it $1 /usr/bin/kafka-topics --delete --topic $2 --zookeeper zookeeper:2181
+    docker exec -it $1 /usr/bin/kafka-topics --create --topic $2 --partitions $3 --replication-factor $4 \
+      --config "cleanup.policy=compact" \
+      --zookeeper zookeeper:2181
 }
 
 CONTAINER="azkarra-cp-broker"
@@ -28,6 +31,8 @@ if [ -z `docker-compose ps -q $SERVICE` ] || [ -z `docker ps -q --no-trunc | gre
 else
   create_topic $CONTAINER streams-plaintext-input 3 1
   create_topic $CONTAINER streams-wordcount-output 3 1
+  create_topic $CONTAINER streams-plaintext-offset-input 3 1
+  create_topic $CONTAINER streams-wordcount-offset-output 3 1
 fi
 
 exit 0

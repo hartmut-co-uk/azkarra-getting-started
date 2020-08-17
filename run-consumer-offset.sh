@@ -16,13 +16,13 @@
 set -e
 
 run_consumer() {
-  docker exec -it $1 /usr/bin/kafka-console-consumer --from-beginning --property print.key=true \
+  docker exec -it $1 /usr/bin/kafka-console-consumer --property print.key=true \
     --property key.separator="-" --property value.deserializer=org.apache.kafka.common.serialization.LongDeserializer \
     --topic $2 --bootstrap-server kafka:9092
 }
 
 CONTAINER="azkarra-cp-broker"
-TOPIC="streams-wordcount-output"
+TOPIC="streams-wordcount-offset-output"
 SERVICE="cp-broker"
 
 if [ -z $(docker-compose ps -q $SERVICE) ] || [ -z $(docker ps -q --no-trunc | grep $(docker-compose ps -q $SERVICE)) ]; then

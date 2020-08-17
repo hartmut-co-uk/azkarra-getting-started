@@ -15,21 +15,20 @@
 # limitations under the License.
 set -e
 
-run_consumer() {
-  docker exec -it $1 /usr/bin/kafka-console-consumer --from-beginning --property print.key=true \
-    --property key.separator="-" --property value.deserializer=org.apache.kafka.common.serialization.LongDeserializer \
-    --topic $2 --bootstrap-server kafka:9092
+run_producer() {
+    docker exec -it $1 /usr/bin/kafka-console-producer --topic $2 --broker-list kafka:9092 \
+      --property "parse.key=true" --property "key.separator=:"
 }
 
 CONTAINER="azkarra-cp-broker"
-TOPIC="streams-wordcount-output"
+TOPIC="streams-plaintext-offset-input"
 SERVICE="cp-broker"
 
-if [ -z $(docker-compose ps -q $SERVICE) ] || [ -z $(docker ps -q --no-trunc | grep $(docker-compose ps -q $SERVICE)) ]; then
+if [ -z `docker-compose ps -q $SERVICE` ] || [ -z `docker ps -q --no-trunc | grep $(docker-compose ps -q $SERVICE)` ]; then
   echo "Docker service $SERVICE is not running, please run command docker-compose up -d before using this script."
   exit 1
 else
-  run_consumer $CONTAINER $TOPIC
+  run_producer $CONTAINER $TOPIC
 fi
 
 exit 0
